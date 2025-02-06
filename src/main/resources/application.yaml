@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: WeddingBot
+  profiles:
+    active: github
+
+telegram:
+  bot-token: ${TELEGRAM_BOT_TOKEN}
+  bot-username: ${TELEGRAM_BOT_USERNAME:ThalitaeJoseCasamentoBot}
+
+langchain-model:
+  github-token: ${GITHUB_TOKEN}
+  ollama-url: ${OLLAMA_URL:'http://localhost:11434/'}
+  model-name: ${MODEL_NAME:deepseek-r1}
