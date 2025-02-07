@@ -3,12 +3,19 @@ spring:
     name: WeddingBot
   profiles:
     active: github
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://${MONGO_USER:admin}:${MONGO_PASSWORD:admin}@localhost:27017/weddingbot?authSource=admin}
 
 telegram:
-  bot-token: ${TELEGRAM_BOT_TOKEN}
+  bot-token: ${TELEGRAM_BOT_TOKEN:default}
   bot-username: ${TELEGRAM_BOT_USERNAME:ThalitaeJoseCasamentoBot}
 
 langchain-model:
-  github-token: ${GITHUB_TOKEN}
-  ollama-url: ${OLLAMA_URL:'http://localhost:11434/'}
+  github-token: ${GITHUB_TOKEN:default}
+  ollama-url: ${OLLAMA_URL:http://localhost:11434/}
   model-name: ${MODEL_NAME:deepseek-r1}
+
+logging:
+  level:
+    org.telegram.abilitybots.api.objects.Ability: WARN
