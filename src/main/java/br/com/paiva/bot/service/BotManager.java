@@ -13,9 +13,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class BotManager extends AbilityBot {
     private final UserService userService;
 
     @Autowired
-    public BotManager(Environment env, @Lazy ResponseHandler responseHandler, UserService userService) {
+    public BotManager(Environment env, @Lazy ResponseHandler responseHandler,@Lazy UserService userService) {
         super(env.getProperty("telegram.bot-token"), env.getProperty("telegram.bot-username"));
         this.responseHandler = responseHandler;
         this.userService = userService;
@@ -84,24 +84,30 @@ public class BotManager extends AbilityBot {
         sendMessage.setChatId(chatId);
         sendMessage.setText(Constants.FIRST_CONTACT);
         sendMessage.setReplyMarkup(markup);
+        sendMessage.enableMarkdown(true);
 
         silent.execute(sendMessage);
     }
 
-    @Tool("Send the bride and groom's pix separately to the user")
-    @Lazy
-    public void sendRequestedPix(@ToolMemoryId Long chatId){
-        executeSendMessage(chatId, Constants.FORMATTED_PIX_SENT);
-        executeSendMessage(chatId, Constants.PIX_NUMBER);
-    }
-
     private void executeSendMessage(long chatId, String text){
+
+        ReplyKeyboardRemove removeKeyboard = new ReplyKeyboardRemove();
+        removeKeyboard.setRemoveKeyboard(true);
+
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(text);
         sendMessage.enableMarkdown(true);
+        sendMessage.setReplyMarkup(removeKeyboard);
 
         silent.execute(sendMessage);
+    }
+
+    @Tool("send the pix to the user")
+    @Lazy
+    public void sendRequestedPix(@ToolMemoryId Long chatId){
+        executeSendMessage(chatId, Constants.FORMATTED_PIX_SENT);
+        executeSendMessage(chatId, Constants.PIX_NUMBER);
     }
 
     @Override
