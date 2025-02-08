@@ -20,6 +20,10 @@ public class UserService {
         return userRepository.findByChatId(chatId).isEmpty();
     }
 
+    public Optional<User> getUser(Long chatId){
+        return userRepository.findByChatId(chatId);
+    }
+
     public boolean contactHasBeenSent(Long chatId) {
         Optional<User> user = userRepository.findByChatId(chatId);
         return user.map(User::isContactSent).orElse(false);

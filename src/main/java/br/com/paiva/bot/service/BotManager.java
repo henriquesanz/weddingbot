@@ -1,16 +1,21 @@
 package br.com.paiva.bot.service;
 
 import br.com.paiva.bot.utils.Constants;
+import dev.langchain4j.agent.tool.Tool;
+import dev.langchain4j.agent.tool.ToolMemoryId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.AbilityBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +29,7 @@ public class BotManager extends AbilityBot {
     private final UserService userService;
 
     @Autowired
-    public BotManager(Environment env, ResponseHandler responseHandler, UserService userService) {
+    public BotManager(Environment env, @Lazy ResponseHandler responseHandler, UserService userService) {
         super(env.getProperty("telegram.bot-token"), env.getProperty("telegram.bot-username"));
         this.responseHandler = responseHandler;
         this.userService = userService;
@@ -50,6 +55,7 @@ public class BotManager extends AbilityBot {
                 firstContact(chatId);
             } else {
                 if(userService.contactHasBeenSent(chatId)) {
+                    silent.execute(new SendChatAction(chatId.toString(), "typing", update.getUpdateId()));
                     executeSendMessage(chatId, responseHandler.replyToMessages(chatId, receivedMessage));
                 }else {
                     executeSendMessage(chatId, Constants.REQUEST_CONTACT);
@@ -72,6 +78,7 @@ public class BotManager extends AbilityBot {
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         markup.setKeyboard(keyboard);
         markup.setResizeKeyboard(true);
+        markup.setOneTimeKeyboard(true);
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -81,10 +88,19 @@ public class BotManager extends AbilityBot {
         silent.execute(sendMessage);
     }
 
+    @Tool("Send the bride and groom's pix separately to the user")
+    @Lazy
+    public void sendRequestedPix(@ToolMemoryId Long chatId){
+        executeSendMessage(chatId, Constants.FORMATTED_PIX_SENT);
+        executeSendMessage(chatId, Constants.PIX_NUMBER);
+    }
+
     private void executeSendMessage(long chatId, String text){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(text);
+        sendMessage.enableMarkdown(true);
+
         silent.execute(sendMessage);
     }
 

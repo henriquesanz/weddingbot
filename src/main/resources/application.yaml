@@ -2,10 +2,12 @@ spring:
   application:
     name: WeddingBot
   profiles:
-    active: github
+    active: openai
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://${MONGO_USER:admin}:${MONGO_PASSWORD:admin}@localhost:27017/weddingbot?authSource=admin}
+  main:
+    allow-circular-references: true
 
 telegram:
   bot-token: ${TELEGRAM_BOT_TOKEN:default}
@@ -14,7 +16,8 @@ telegram:
 langchain-model:
   github-token: ${GITHUB_TOKEN:default}
   ollama-url: ${OLLAMA_URL:http://localhost:11434/}
-  model-name: ${MODEL_NAME:deepseek-r1}
+  model-name: ${MODEL_NAME:gpt-4o-mini}
+  openai-api-key: ${OPENAI_TOKEN:default}
 
 logging:
   level:

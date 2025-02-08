@@ -22,6 +22,16 @@ public class ChatMemoryBean implements ChatMemoryProvider {
                 .build());
     }
 
+    public String clearMemory() {
+        memories.clear();
+        return "Memory cleared successfully!";
+    }
+
+    public String clearMemoryById(Object memoryId){
+        memories.remove(memoryId);
+        return String.format("Memory with id %s cleared successfully!", memoryId.toString());
+    }
+
     @PreDestroy
     public void close() {
         memories.clear();
