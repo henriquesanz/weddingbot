@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.AbilityBot;
+import org.telegram.abilitybots.api.toggle.BareboneToggle;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -24,13 +25,15 @@ import java.util.List;
 @Slf4j
 public class BotManager extends AbilityBot {
 
+    private static final BareboneToggle toggle = new BareboneToggle();
+
     private final ResponseHandler responseHandler;
 
     private final UserService userService;
 
     @Autowired
     public BotManager(Environment env, @Lazy ResponseHandler responseHandler,@Lazy UserService userService) {
-        super(env.getProperty("telegram.bot-token"), env.getProperty("telegram.bot-username"));
+        super(env.getProperty("telegram.bot-token"), env.getProperty("telegram.bot-username"), toggle);
         this.responseHandler = responseHandler;
         this.userService = userService;
     }
