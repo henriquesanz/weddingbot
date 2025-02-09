@@ -5,11 +5,14 @@ import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.ToolMemoryId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import org.telegram.abilitybots.api.bot.AbilityBot;
-import org.telegram.abilitybots.api.toggle.BareboneToggle;
+import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
+import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
+import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
+import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -17,28 +20,44 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @Slf4j
-public class BotManager extends AbilityBot {
+public class BotManager implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
 
-    private static final BareboneToggle toggle = new BareboneToggle();
+    private final TelegramClient telegramClient;
 
     private final ResponseHandler responseHandler;
 
     private final UserService userService;
 
+    private final Environment env;
+
     @Autowired
-    public BotManager(Environment env, @Lazy ResponseHandler responseHandler,@Lazy UserService userService) {
-        super(env.getProperty("telegram.bot-token"), env.getProperty("telegram.bot-username"), toggle);
+    public BotManager(ResponseHandler responseHandler, UserService userService, Environment environment) {
         this.responseHandler = responseHandler;
         this.userService = userService;
+        this.env = environment;
+        telegramClient = new OkHttpTelegramClient(getBotToken());
     }
 
-    public void onUpdateReceived(Update update) {
+    @Override
+    public String getBotToken() {
+        return env.getProperty("telegram.bot-token");
+    }
+
+    @Override
+    public LongPollingUpdateConsumer getUpdatesConsumer() {
+        return this;
+    }
+
+    @Override
+    public void consume(Update update) {
         if(update.getMessage().hasContact()){
             Long chatId = update.getMessage().getChatId();
             String fullName = String.format("%s %s", update.getMessage().getContact().getFirstName(), update.getMessage().getContact().getLastName());
@@ -55,10 +74,18 @@ public class BotManager extends AbilityBot {
             if (userService.isNewUser(chatId)) {
                 userService.createUser(chatId);
 
-                firstContact(chatId);
+                try {
+                    firstContact(chatId);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 if(userService.contactHasBeenSent(chatId)) {
-                    silent.execute(new SendChatAction(chatId.toString(), "typing", update.getUpdateId()));
+                    try {
+                        telegramClient.execute(new SendChatAction(chatId.toString(), "typing"));
+                    } catch (TelegramApiException e) {
+                        throw new RuntimeException(e);
+                    }
                     executeSendMessage(chatId, responseHandler.replyToMessages(chatId, receivedMessage));
                 }else {
                     executeSendMessage(chatId, Constants.REQUEST_CONTACT);
@@ -68,7 +95,7 @@ public class BotManager extends AbilityBot {
         }
     }
 
-    private void firstContact(Long chatId) {
+    private void firstContact(Long chatId) throws TelegramApiException {
         KeyboardButton contactButton = new KeyboardButton("Send contact");
         contactButton.setRequestContact(true);
 
@@ -78,32 +105,30 @@ public class BotManager extends AbilityBot {
         List<KeyboardRow> keyboard = new ArrayList<>();
         keyboard.add(row);
 
-        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
-        markup.setKeyboard(keyboard);
+        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup(keyboard);
         markup.setResizeKeyboard(true);
         markup.setOneTimeKeyboard(true);
 
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(Constants.FIRST_CONTACT);
+        SendMessage sendMessage = new SendMessage(String.valueOf(chatId), Constants.FIRST_CONTACT);
         sendMessage.setReplyMarkup(markup);
         sendMessage.enableMarkdown(true);
 
-        silent.execute(sendMessage);
+        telegramClient.execute(sendMessage);
     }
 
     private void executeSendMessage(long chatId, String text){
 
-        ReplyKeyboardRemove removeKeyboard = new ReplyKeyboardRemove();
-        removeKeyboard.setRemoveKeyboard(true);
+        ReplyKeyboardRemove removeKeyboard = new ReplyKeyboardRemove(true);
 
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(text);
+        SendMessage sendMessage = new SendMessage(String.valueOf(chatId), text);
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(removeKeyboard);
 
-        silent.execute(sendMessage);
+        try {
+            telegramClient.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Tool("send the pix to the user")
@@ -111,11 +136,6 @@ public class BotManager extends AbilityBot {
     public void sendRequestedPix(@ToolMemoryId Long chatId){
         executeSendMessage(chatId, Constants.FORMATTED_PIX_SENT);
         executeSendMessage(chatId, Constants.PIX_NUMBER);
-    }
-
-    @Override
-    public long creatorId() {
-        return 1L;
     }
 
 }

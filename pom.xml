@@ -20,7 +20,7 @@
 		<java.version>17</java.version>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
-		<telegram.version>6.9.0</telegram.version>
+		<telegram.version>8.0.0</telegram.version>
 		<langchain4j.version>1.0.0-alpha1</langchain4j.version>
 		<springboot.version>3.4.2</springboot.version>
 	</properties>
@@ -56,16 +56,14 @@
 			<version>20250107</version>
 		</dependency>
 
-		<!-- Telegram Dependencies -->
 		<dependency>
 			<groupId>org.telegram</groupId>
-			<artifactId>telegrambots-spring-boot-starter</artifactId>
+			<artifactId>telegrambots-springboot-longpolling-starter</artifactId>
 			<version>${telegram.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.telegram</groupId>
-			<artifactId>telegrambots-abilities</artifactId>
+			<artifactId>telegrambots-client</artifactId>
 			<version>${telegram.version}</version>
 		</dependency>
 
