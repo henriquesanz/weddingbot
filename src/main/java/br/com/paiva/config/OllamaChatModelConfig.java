@@ -1,4 +1,4 @@
-package br.com.paiva.bot.config;
+package br.com.paiva.config;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;

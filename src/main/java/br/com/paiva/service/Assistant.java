@@ -1,4 +1,4 @@
-package br.com.paiva.bot.service;
+package br.com.paiva.service;
 
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;

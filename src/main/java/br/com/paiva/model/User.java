@@ -1,4 +1,4 @@
-package br.com.paiva.bot.model;
+package br.com.paiva.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

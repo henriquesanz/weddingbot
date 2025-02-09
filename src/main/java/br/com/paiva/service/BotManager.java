@@ -1,6 +1,6 @@
-package br.com.paiva.bot.service;
+package br.com.paiva.service;
 
-import br.com.paiva.bot.utils.Constants;
+import br.com.paiva.utils.Constants;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.ToolMemoryId;
 import lombok.extern.slf4j.Slf4j;

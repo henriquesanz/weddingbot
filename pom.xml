@@ -103,39 +103,17 @@
 			<artifactId>langchain4j-chroma</artifactId>
 		</dependency>
 
-		<!-- JUnit 5 -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.9.3</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.9.3</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Mockito -->
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>5.8.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>5.8.0</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Spring Boot Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.vaadin.external.google</groupId>
+					<artifactId>android-json</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-mongodb -->
@@ -151,31 +129,23 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>${springboot.version}</version>
 		</dependency>
-
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${springboot.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>1.18.30</version>
-						</path>
-					</annotationProcessorPaths>
+					<mainClass>br.com.paiva.WeddingBotApplication</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>

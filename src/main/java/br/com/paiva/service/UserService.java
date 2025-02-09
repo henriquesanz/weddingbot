@@ -1,8 +1,11 @@
-package br.com.paiva.bot.service;
+package br.com.paiva.service;
 
-import br.com.paiva.bot.model.User;
-import br.com.paiva.bot.repository.UserRepository;
+import br.com.paiva.model.User;
+import br.com.paiva.repository.UserRepository;
+import dev.langchain4j.agent.tool.Tool;
+import dev.langchain4j.agent.tool.ToolMemoryId;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
@@ -10,11 +13,8 @@ import java.util.Optional;
 @Slf4j
 public class UserService {
 
-    private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     public boolean isNewUser(Long chatId) {
         return userRepository.findByChatId(chatId).isEmpty();
@@ -51,6 +51,16 @@ public class UserService {
         if(userOptional.isPresent()){
             User user = userOptional.get();
             user.setContactSent(true);
+            userRepository.save(user);
+        }
+    }
+
+    @Tool("saves a message from the user to the bride and groom")
+    public void saveUserNotes(@ToolMemoryId Long chatId, String message){
+        Optional<User> userOptional = userRepository.findByChatId(chatId);
+        if(userOptional.isPresent()){
+            User user = userOptional.get();
+            user.setNotes(message);
             userRepository.save(user);
         }
     }

@@ -1,10 +1,10 @@
-package br.com.paiva.bot;
+package br.com.paiva;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CasamentoBotApplicationTests {
+class WeddingBotApplicationTests {
 
 	@Test
 	void contextLoads() {

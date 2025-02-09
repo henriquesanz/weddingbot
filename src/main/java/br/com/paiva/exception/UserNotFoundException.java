@@ -1,4 +1,4 @@
-package br.com.paiva.bot.exception;
+package br.com.paiva.exception;
 
 public class UserNotFoundException extends Exception {
 

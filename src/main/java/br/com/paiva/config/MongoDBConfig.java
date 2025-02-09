@@ -1,8 +1,8 @@
-package br.com.paiva.bot.config;
+package br.com.paiva.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
-@EnableMongoRepositories(basePackages = "br.com.paiva.bot.repository")
+@EnableMongoRepositories(basePackages = "br.com.paiva.repository")
 public class MongoDBConfig {}

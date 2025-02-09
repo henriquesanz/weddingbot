@@ -1,8 +1,8 @@
-package br.com.paiva.bot.service;
+package br.com.paiva.service;
 
-import br.com.paiva.bot.exception.UserNotFoundException;
-import br.com.paiva.bot.model.User;
-import br.com.paiva.bot.utils.Constants;
+import br.com.paiva.exception.UserNotFoundException;
+import br.com.paiva.model.User;
+import br.com.paiva.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

@@ -1,8 +1,9 @@
-package br.com.paiva.bot.controller;
+package br.com.paiva.controller;
 
-import br.com.paiva.bot.memory.ChatMemoryBean;
-import br.com.paiva.bot.model.Gift;
-import br.com.paiva.bot.service.GiftServiceTool;
+import br.com.paiva.memory.ChatMemoryBean;
+import br.com.paiva.model.Gift;
+import br.com.paiva.service.GiftService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,11 +12,12 @@ public class WeddingBotController {
 
     private final ChatMemoryBean chatMemoryBean;
 
-    private final GiftServiceTool giftServiceTool;
+    private final GiftService giftService;
 
-    public WeddingBotController(ChatMemoryBean chatMemoryBean, GiftServiceTool giftServiceTool) {
+    @Autowired
+    public WeddingBotController(ChatMemoryBean chatMemoryBean, GiftService giftService) {
         this.chatMemoryBean = chatMemoryBean;
-        this.giftServiceTool = giftServiceTool;
+        this.giftService = giftService;
     }
 
     @GetMapping("/status")
@@ -35,7 +37,7 @@ public class WeddingBotController {
 
     @PostMapping("/register/gift")
     public String registerGift(@RequestBody Gift body){
-        giftServiceTool.createGift(body.getName(), body.getStatus(), body.getReservedBy());
+        giftService.createGift(body);
         return "Gift register succesfully";
     }
 

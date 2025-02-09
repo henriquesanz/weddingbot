@@ -1,4 +1,4 @@
-package br.com.paiva.bot.memory;
+package br.com.paiva.memory;
 
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;

@@ -1,14 +1,16 @@
-package br.com.paiva.bot;
+package br.com.paiva;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @SpringBootApplication
+@ComponentScan(basePackages = "br.com.paiva")
 public class WeddingBotApplication {
 
 	public static void main(String[] args) {

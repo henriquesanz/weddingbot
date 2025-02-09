@@ -1,31 +1,28 @@
-package br.com.paiva.bot.service;
+package br.com.paiva.service;
 
-import br.com.paiva.bot.exception.UserNotFoundException;
-import br.com.paiva.bot.model.Gift;
-import br.com.paiva.bot.model.User;
-import br.com.paiva.bot.repository.GiftRepository;
-import br.com.paiva.bot.repository.UserRepository;
+import br.com.paiva.exception.UserNotFoundException;
+import br.com.paiva.model.Gift;
+import br.com.paiva.model.User;
+import br.com.paiva.repository.GiftRepository;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.ToolMemoryId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class GiftServiceTool {
+public class GiftService {
 
-    private final GiftRepository giftRepository;
+    @Autowired
+    private GiftRepository giftRepository;
 
-    private final UserService userService;
-
-    public GiftServiceTool(GiftRepository giftRepository, UserService userService) {
-        this.giftRepository = giftRepository;
-        this.userService = userService;
-    }
+    @Autowired
+    private UserService userService;
 
     @Tool("lista os presentes que o casal já recebeu")
     public String getAvailableGifts() {
-        List<Gift> gifts = giftRepository.findByStatus("Reserved");
+        List<Gift> gifts = giftRepository.findByStatus("reserved");
 
         if (gifts.isEmpty()) {
             return "Nenhum presente foi recebido até o momento.";
@@ -47,8 +44,7 @@ public class GiftServiceTool {
         giftRepository.save(gift);
     }
 
-    public void createGift(String giftName, String status, String reservedBy) {
-        Gift gift = new Gift(giftName, status, reservedBy);
+    public void createGift(Gift gift) {
         giftRepository.save(gift);
     }
 
